@@ -15,7 +15,6 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     previewfilemodel.cpp \
-    importfileeditor.cpp \
     mapfilemodel.cpp \
     importdialog.cpp \
     mapfilewidget.cpp \
@@ -24,7 +23,6 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     previewfilemodel.h \
-    importfileeditor.h \
     mapfilemodel.h \
     importdialog.h \
     mapfilewidget.h \

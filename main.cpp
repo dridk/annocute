@@ -2,7 +2,6 @@
 #include <QApplication>
 #include <QTableView>
 #include "previewfilemodel.h"
-#include "importfileeditor.h"
 #include "mapfilemodel.h"
 #include "importdialog.h"
 int main(int argc, char *argv[])
@@ -10,17 +9,17 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-  ImportDialog dialog;
-  dialog.show();
+    ImportDialog dialog;
+    dialog.show();
 
 
-//    QTableView view;
-//    PreviewFileModel * model = new PreviewFileModel;
-//    view.setModel(model);
+    //    QTableView view;
+    //    PreviewFileModel * model = new PreviewFileModel;
+    //    view.setModel(model);
 
-//    model->load("/home/sacha/testdb/refGene.txt");
+    //    model->load("/home/sacha/testdb/refGene.txt");
 
-//    view.show();
+    //    view.show();
 
     return a.exec();
 }

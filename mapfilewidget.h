@@ -9,6 +9,7 @@ class MapFileWidget : public QTableView
 public:
     explicit MapFileWidget(QWidget *parent = Q_NULLPTR);
     void setColumnCount(int count);
+    const QList<MapItem>& items() const;
 
 
 private:

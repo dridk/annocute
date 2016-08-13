@@ -3,7 +3,7 @@
 
 #include <QtWidgets>
 #include <QDialog>
-#include <QSqlQuery>
+#include <QtSql>
 #include <QSqlDatabase>
 #include <QDialogButtonBox>
 #include <QTableView>
@@ -18,10 +18,9 @@ public:
     ImportDialog(QWidget * parent = Q_NULLPTR);
 
     void setFilename(const QString& source);
-    const QString& source() const;
-    const QString& output() const;
 
-    const QString& dbName() const;
+
+
 
 
 

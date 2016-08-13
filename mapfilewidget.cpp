@@ -19,6 +19,11 @@ MapFileWidget::MapFileWidget(QWidget *parent) :
 
 void MapFileWidget::setColumnCount(int count)
 {
- mModel->setColumnCount(count);
+    mModel->setColumnCount(count);
+}
+
+const QList<MapItem> &MapFileWidget::items() const
+{
+ return mModel->items();
 }
 

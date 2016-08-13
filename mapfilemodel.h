@@ -32,6 +32,8 @@ Q_ENUM(MapItemType)
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
+    const QList<MapItem>& items() const;
+
 private:
     QList<MapItem> mDatas;
     QString mFilename;

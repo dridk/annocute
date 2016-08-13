@@ -144,3 +144,8 @@ Qt::ItemFlags MapFileModel::flags(const QModelIndex &index) const
 
 
 }
+
+const QList<MapItem> &MapFileModel::items() const
+{
+ return mDatas;
+}

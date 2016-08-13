@@ -108,20 +108,7 @@ void ImportDialog::setFilename(const QString &filename)
 
 }
 
-const QString &ImportDialog::output() const
-{
-    return mOutputEdit->lineEdit()->text();
-}
 
-const QString &ImportDialog::dbName() const
-{
-    return mDbNameEdit->text();
-}
-
-const QString& ImportDialog::source() const
-{
-    return mSourceEdit->lineEdit()->text();
-}
 
 void ImportDialog::columnChanged(const QModelIndex &current, const QModelIndex &previous)
 {
@@ -148,42 +135,18 @@ void ImportDialog::columnChanged(const QModelIndex &current, const QModelIndex &
 bool ImportDialog::createDatabase()
 {
 
-    createTables();
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    QFile::remove("/home/sacha/test.DB");
+    db.setDatabaseName("/home/sacha/test.DB");
+    if (db.open())
+    {
 
-//    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-//    db.setDatabaseName("/home/sacha/test.DB");
+        createTables();
+        importDatas();
 
+        db.close();
 
-
-
-
-
-
-
-//    if (db.open())
-//    {
-
-//        QFile file(mFilename);
-//        if (file.open(QIODevice::ReadOnly|QIODevice::Text))
-//        {
-//            QTextStream stream(&file);
-//            QString line;
-//            int count = 0;
-//            while (stream.readLineInto(&line))
-//            {
-//                QVariantList row;
-//                foreach ( QString value , line.split(mSeparator))
-//                {
-//                    row.append(value);
-//                }
-
-//                mDatas.append(row);
-//                count++;
-//            }
-
-//        }
-
-//    }
+    }
 
 
     return false;
@@ -193,7 +156,40 @@ bool ImportDialog::createDatabase()
 bool ImportDialog::createTables()
 {
 
+        qDebug()<<"create table";
 
+
+
+        QMetaEnum metaEnum = MapFileModel::staticMetaObject.enumerator(MapFileModel::staticMetaObject.indexOfEnumerator("MapItemType"));
+
+// Prepare query field
+        QStringList queryField;
+//        queryField.append("ID INT PRIMARY KEY NOT NULL");
+
+        foreach (MapItem item, mMapWidget->items())
+        {
+            QString type = metaEnum.key(item.type);
+            if (type == "CHROMOSOM")
+                type = "Text";
+            if (type == "Start" || type == "End")
+                type = "Integer";
+
+           queryField.append(QString("%1 %2").arg(item.name).arg(type));
+
+        }
+
+        // Prepare query create
+
+
+        QString query = QString("CREATE TABLE %1 ( %2 );").arg("test").arg(queryField.join(","));
+
+        qDebug()<<query;
+
+        QSqlQuery sqlQuery;
+        sqlQuery.exec(query);
+
+        if (sqlQuery.exec() == false)
+            qDebug()<<sqlQuery.lastError().text();
 
 
 
@@ -201,5 +197,61 @@ bool ImportDialog::createTables()
 
 bool ImportDialog::importDatas()
 {
+
+    QFile file(mFilename);
+    if (file.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+        QTextStream stream(&file);
+        QString line;
+        int count = 0;
+        QSqlQuery c;
+        c.exec("BEGIN");
+        while (stream.readLineInto(&line) )
+        {
+            QVariantList rows;
+            QStringList placeholders;
+            foreach ( QString value , line.split(QChar::Tabulation))
+            {
+                rows.append(value);
+                placeholders.append("?");
+            }
+
+         ;
+            count++;
+
+            // inject
+            QString q = QString("INSERT INTO test VALUES (%1)").arg(placeholders.join(","));
+            QSqlQuery query;
+            query.prepare(q);
+
+            for (int i=0; i < rows.count(); ++i)
+            {
+             query.bindValue(i, rows.at(i));
+
+            }
+
+            if (!query.exec())
+            {
+                qDebug()<<query.lastQuery();
+                qDebug()<<query.lastError().text();
+            }
+
+
+
+        }
+         c.exec("END");
+        qDebug()<<"END";
+
+        return true;
+    }
+    return false;
+
+
+
+
+
+
+
+
 
 }
