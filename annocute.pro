@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 CONFIG += c++11
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,12 +17,18 @@ SOURCES += main.cpp\
     previewfilemodel.cpp \
     importfileeditor.cpp \
     mapfilemodel.cpp \
-    importdialog.cpp
+    importdialog.cpp \
+    mapfilewidget.cpp \
+    previewfilewidget.cpp \
+    pathlineedit.cpp
 
 HEADERS  += mainwindow.h \
     previewfilemodel.h \
     importfileeditor.h \
     mapfilemodel.h \
-    importdialog.h
+    importdialog.h \
+    mapfilewidget.h \
+    previewfilewidget.h \
+    pathlineedit.h
 
 FORMS    += mainwindow.ui

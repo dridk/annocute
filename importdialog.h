@@ -3,10 +3,13 @@
 
 #include <QtWidgets>
 #include <QDialog>
+#include <QSqlQuery>
+#include <QSqlDatabase>
 #include <QDialogButtonBox>
 #include <QTableView>
-#include "mapfilemodel.h"
-#include "previewfilemodel.h"
+#include "previewfilewidget.h"
+#include "mapfilewidget.h"
+#include "pathlineedit.h"
 
 class ImportDialog : public QDialog
 {
@@ -14,13 +17,41 @@ class ImportDialog : public QDialog
 public:
     ImportDialog(QWidget * parent = Q_NULLPTR);
 
+    void setFilename(const QString& source);
+    const QString& source() const;
+    const QString& output() const;
+
+    const QString& dbName() const;
+
+
+
+
+protected Q_SLOTS:
+    void columnChanged(const QModelIndex &current, const QModelIndex &previous);
+    bool createDatabase();
+
+    bool createTables();
+    bool importDatas();
+
 private:
 QDialogButtonBox * mButtonBox;
-QTableView * mMapView;
-QTableView * mPreviewView;
 
-MapFileModel * mMapModel;
-PreviewFileModel * mPreviewModel;
+PreviewFileWidget * mPreviewWidget;
+MapFileWidget * mMapWidget;
+
+PathLineEdit * mSourceEdit;
+PathLineEdit * mOutputEdit;
+
+
+QLineEdit * mDbNameEdit;
+QPlainTextEdit * mDescriptionEdit;
+QComboBox * mReferenceCombo;
+QComboBox * mDelimiterCombo;
+QTabWidget * mTabWidget;
+
+QString mFilename;
+
+
 
 
 };

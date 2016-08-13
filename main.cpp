@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
   ImportDialog dialog;
-  dialog.exec();
+  dialog.show();
 
 
 //    QTableView view;
