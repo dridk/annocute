@@ -10,8 +10,8 @@ ImportDialog::ImportDialog(QWidget *parent)
     QVBoxLayout * tab1Layout = new QVBoxLayout;
     QVBoxLayout * tab2Layout = new QVBoxLayout;
 
-    mSourceEdit = new PathLineEdit;
-    mOutputEdit = new PathLineEdit;
+    mSourceEdit = new PathLineEdit(false);
+    mOutputEdit = new PathLineEdit(true);
     mDbNameEdit = new QLineEdit;
     mDescriptionEdit = new QPlainTextEdit;
     mReferenceCombo = new QComboBox;

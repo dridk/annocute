@@ -8,17 +8,15 @@ class PathLineEdit : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PathLineEdit(QWidget *parent = 0);
-
+    explicit PathLineEdit(bool saveMode = false,QWidget *parent = 0);
     QLineEdit *lineEdit();
-
-signals:
-
-public slots:
+protected slots:
+void openFileDialog();
 
 private:
     QLineEdit * mLineEdit;
     QPushButton * mButton;
+    bool mSaveMode ;
 };
 
 #endif // PATHLINEEDIT_H
