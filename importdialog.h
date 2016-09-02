@@ -36,7 +36,6 @@ private:
 QDialogButtonBox * mButtonBox;
 
 PreviewFileWidget * mPreviewWidget;
-MapFileWidget * mMapWidget;
 
 PathLineEdit * mSourceEdit;
 PathLineEdit * mOutputEdit;

@@ -18,7 +18,6 @@ ImportDialog::ImportDialog(QWidget *parent)
     mDelimiterCombo = new QComboBox;
 
     mPreviewWidget = new PreviewFileWidget;
-    mMapWidget= new MapFileWidget;
     mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
 
 
@@ -30,11 +29,7 @@ ImportDialog::ImportDialog(QWidget *parent)
 
     ioFormLayout->addRow("Input", mSourceEdit);
     ioFormLayout->addRow("Output", mOutputEdit);
-    ioFormLayout->addRow("Delimiter", mDelimiterCombo);
-
     ioGroup->setLayout(ioFormLayout);
-
-
     tab1Layout->addWidget(ioGroup);
 
     // ------------ second Group ---------------
@@ -51,23 +46,20 @@ ImportDialog::ImportDialog(QWidget *parent)
 
     // ------------ Last Group --------------
 
-    QGroupBox * toolFrame = new QGroupBox("Option");
-    QFormLayout * toolLayout = new QFormLayout;
-    toolLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-    toolLayout->setFormAlignment(Qt::AlignLeft);
-    toolLayout->addRow("Delimiter",new QComboBox());
-    toolLayout->addRow("Skip first line",new QCheckBox);
+    QSplitter * splitter = new QSplitter(Qt::Horizontal);
+    QFrame * optionFrame = new QFrame;
+    QVBoxLayout * toolLayout = new QVBoxLayout;
+    toolLayout->addWidget(new QComboBox());
+    toolLayout->addWidget(new QCheckBox("disable"));
+    toolLayout->addWidget(new QLineEdit());
+    toolLayout->addWidget(new QPlainTextEdit());
+    optionFrame->setLayout(toolLayout);
+    optionFrame->setContentsMargins(0,0,0,0);
 
-    toolFrame->setLayout(toolLayout);
-
-
-    QSplitter * splitter = new QSplitter(Qt::Vertical);
-
-    splitter->addWidget(mMapWidget);
+    splitter->addWidget(optionFrame);
     splitter->addWidget(mPreviewWidget);
-    splitter->setHandleWidth(20);
 
-    tab2Layout->addWidget(toolFrame);
+
     tab2Layout->addWidget(splitter);
 
     // ------------Box bar -------------------
@@ -79,6 +71,7 @@ ImportDialog::ImportDialog(QWidget *parent)
     tab2->setLayout(tab2Layout);
     mTabWidget->addTab(tab1, "description");
     mTabWidget->addTab(tab2, "column mapping");
+    mTabWidget->setCurrentIndex(1);
 
 
     mainLayout->addWidget(mTabWidget);
@@ -87,7 +80,6 @@ ImportDialog::ImportDialog(QWidget *parent)
     // ------------Connection-------------------
 
     connect(mPreviewWidget->selectionModel(), SIGNAL(currentColumnChanged(QModelIndex,QModelIndex)),this, SLOT(columnChanged(QModelIndex,QModelIndex)));
-    connect(mMapWidget->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this, SLOT(columnChanged(QModelIndex,QModelIndex)));
     connect(mButtonBox,SIGNAL(rejected()),this,SLOT(close()));
     connect(mButtonBox,SIGNAL(accepted()),this,SLOT(createDatabase()));
 
@@ -95,7 +87,7 @@ ImportDialog::ImportDialog(QWidget *parent)
     setLayout(mainLayout);
     resize(800,600);
 
-    setFilename("/home/sacha/testdb/refGene.txt");
+    setFilename("/home/schutz/refGene.txt");
 
 
 }
@@ -103,7 +95,6 @@ ImportDialog::ImportDialog(QWidget *parent)
 void ImportDialog::setFilename(const QString &filename)
 {
     mPreviewWidget->setFilename(filename);
-    mMapWidget->setColumnCount(mPreviewWidget->model()->columnCount());
     mFilename = filename;
 
 }
@@ -113,20 +104,6 @@ void ImportDialog::setFilename(const QString &filename)
 void ImportDialog::columnChanged(const QModelIndex &current, const QModelIndex &previous)
 {
 
-    if ( sender() == mMapWidget->selectionModel())
-    {
-
-        mPreviewWidget->selectColumn(current.row());
-
-    }
-
-
-    if ( sender() == mPreviewWidget->selectionModel())
-    {
-        mMapWidget->selectRow(current.column());
-
-
-    }
 
 
 
@@ -156,40 +133,40 @@ bool ImportDialog::createDatabase()
 bool ImportDialog::createTables()
 {
 
-        qDebug()<<"create table";
+//        qDebug()<<"create table";
 
 
 
-        QMetaEnum metaEnum = MapFileModel::staticMetaObject.enumerator(MapFileModel::staticMetaObject.indexOfEnumerator("MapItemType"));
+//        QMetaEnum metaEnum = MapFileModel::staticMetaObject.enumerator(MapFileModel::staticMetaObject.indexOfEnumerator("MapItemType"));
 
-// Prepare query field
-        QStringList queryField;
-//        queryField.append("ID INT PRIMARY KEY NOT NULL");
+//// Prepare query field
+//        QStringList queryField;
+////        queryField.append("ID INT PRIMARY KEY NOT NULL");
 
-        foreach (MapItem item, mMapWidget->items())
-        {
-            QString type = metaEnum.key(item.type);
-            if (type == "CHROMOSOM")
-                type = "Text";
-            if (type == "Start" || type == "End")
-                type = "Integer";
+//        foreach (MapItem item, mMapWidget->items())
+//        {
+//            QString type = metaEnum.key(item.type);
+//            if (type == "CHROMOSOM")
+//                type = "Text";
+//            if (type == "Start" || type == "End")
+//                type = "Integer";
 
-           queryField.append(QString("%1 %2").arg(item.name).arg(type));
+//           queryField.append(QString("%1 %2").arg(item.name).arg(type));
 
-        }
+//        }
 
-        // Prepare query create
+//        // Prepare query create
 
 
-        QString query = QString("CREATE TABLE %1 ( %2 );").arg("test").arg(queryField.join(","));
+//        QString query = QString("CREATE TABLE %1 ( %2 );").arg("test").arg(queryField.join(","));
 
-        qDebug()<<query;
+//        qDebug()<<query;
 
-        QSqlQuery sqlQuery;
-        sqlQuery.exec(query);
+//        QSqlQuery sqlQuery;
+//        sqlQuery.exec(query);
 
-        if (sqlQuery.exec() == false)
-            qDebug()<<sqlQuery.lastError().text();
+//        if (sqlQuery.exec() == false)
+//            qDebug()<<sqlQuery.lastError().text();
 
 
 
@@ -198,53 +175,53 @@ bool ImportDialog::createTables()
 bool ImportDialog::importDatas()
 {
 
-    QFile file(mFilename);
-    if (file.open(QIODevice::ReadOnly|QIODevice::Text))
-    {
-        QTextStream stream(&file);
-        QString line;
-        int count = 0;
-        QSqlQuery c;
-        c.exec("BEGIN");
-        while (stream.readLineInto(&line) )
-        {
-            QVariantList rows;
-            QStringList placeholders;
-            foreach ( QString value , line.split(QChar::Tabulation))
-            {
-                rows.append(value);
-                placeholders.append("?");
-            }
+//    QFile file(mFilename);
+//    if (file.open(QIODevice::ReadOnly|QIODevice::Text))
+//    {
+//        QTextStream stream(&file);
+//        QString line;
+//        int count = 0;
+//        QSqlQuery c;
+//        c.exec("BEGIN");
+//        while (stream.readLineInto(&line) )
+//        {
+//            QVariantList rows;
+//            QStringList placeholders;
+//            foreach ( QString value , line.split(QChar::Tabulation))
+//            {
+//                rows.append(value);
+//                placeholders.append("?");
+//            }
 
-         ;
-            count++;
+//         ;
+//            count++;
 
-            // inject
-            QString q = QString("INSERT INTO test VALUES (%1)").arg(placeholders.join(","));
-            QSqlQuery query;
-            query.prepare(q);
+//            // inject
+//            QString q = QString("INSERT INTO test VALUES (%1)").arg(placeholders.join(","));
+//            QSqlQuery query;
+//            query.prepare(q);
 
-            for (int i=0; i < rows.count(); ++i)
-            {
-             query.bindValue(i, rows.at(i));
+//            for (int i=0; i < rows.count(); ++i)
+//            {
+//             query.bindValue(i, rows.at(i));
 
-            }
+//            }
 
-            if (!query.exec())
-            {
-                qDebug()<<query.lastQuery();
-                qDebug()<<query.lastError().text();
-            }
+//            if (!query.exec())
+//            {
+//                qDebug()<<query.lastQuery();
+//                qDebug()<<query.lastError().text();
+//            }
 
 
 
-        }
-         c.exec("END");
-        qDebug()<<"END";
+//        }
+//         c.exec("END");
+//        qDebug()<<"END";
 
-        return true;
-    }
-    return false;
+//        return true;
+//    }
+//    return false;
 
 
 
